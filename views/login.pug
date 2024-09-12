@@ -2,9 +2,9 @@ extends layout/login-layout.pug
 
 block content
     .login-container
-        h1 Login
+        h2 Login
         form(method="post")
-            input(type="text", name="logUsername", placeholder="Username or email", required='')
-            input(type="text", name="logUsername", placeholder="Password", required='')
+            input(type="text", name="logusername", placeholder="username or email", required='')
+            input(type="password", name="logPassword", placeholder="Password", required='')
             input(type="submit", value="Login")
-        a(href="/register") Need a account? Register here.
+        a(href="/register") Need an account? Register here.
