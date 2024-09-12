@@ -13,30 +13,34 @@ router.post("/", async (req, res, next) => {
   var email = req.body.email.trim();
   var password = req.body.password;
   var payload = req.body;
+
   if (firstName && lastName && username && email && password) {
-    const user = await User.findOne({
-      $or: [{ username: username }, { email: email }],
-    }).catch((err) => {
+    try {
+      const user = await User.findOne({
+        $or: [{ username: username }, { email: email }],
+      });
+
+      if (!user) {
+        payload.password = await bcrypt.hash(password, 10);
+        const newUser = await User.create(payload);
+        req.session.user = newUser;
+        return res.status(201).redirect("/");
+      } else {
+        if (email === user.email) {
+          payload.errorMessage = "Email is already in use";
+        } else {
+          payload.errorMessage = "Username is already in use";
+        }
+        return res.status(400).render("register", payload);
+      }
+    } catch (err) {
       console.log(err);
       payload.errorMessage = "Something went wrong";
-      res.status(400).render("register", payload);
-    });
-    if (!user) {
-      payload.password = await bcrypt.hash(password, 10);
-      await User.create(payload).then((user) => {
-        console.log(user);
-      });
-    } else {
-      if (email == user.email) {
-        payload.errorMessage = "Email is already in use";
-      } else {
-        payload.errorMessage = "Username is already in user";
-      }
+      return res.status(400).render("register", payload);
     }
   } else {
-    payload.errorMessage = "Please make sure you fill all the field";
-    res.status(400).render("register", payload);
+    payload.errorMessage = "Please make sure you fill all the fields";
+    return res.status(400).render("register", payload);
   }
-  res.status(201).render("register");
 });
 module.exports = router;

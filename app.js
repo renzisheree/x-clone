@@ -8,12 +8,20 @@ const port = 5100;
 const middleware = require("./middleware");
 const path = require("path");
 const mongoose = require("./database");
+const session = require("express-session");
 
 app.set("view engine", "pug");
 app.set("views", "views");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: "renzisheree",
+    resave: true,
+    saveUninitialized: false,
+  })
+);
 //routes
 const loginRoute = require("./routes/login.routes");
 const registerRoute = require("./routes/register.routes");
@@ -21,7 +29,7 @@ app.use("/login", loginRoute);
 app.use("/register", registerRoute);
 
 app.get("/", middleware.requireLogin, (req, res, next) => {
-  var payload = { pageTitle: "Home" };
+  var payload = { pageTitle: "Home", userLoggedIn: req.session.user };
   res.status(200).render("home", payload);
 });
 
