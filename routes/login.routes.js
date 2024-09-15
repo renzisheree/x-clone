@@ -15,19 +15,21 @@ router.post("/", async (req, res, next) => {
     }).catch((error) => {
       console.log(error);
       payload.messageError = "Something went wrong";
-      res.status(200).render(payload);
+      return res.status(200).render("login", payload);
     });
+
     if (user) {
       var result = await bcrypt.compare(req.body.logPassword, user.password);
       if (result) {
         req.session.user = user;
-        res.redirect("/");
+        return res.redirect("/");
       }
     }
     payload.errorMessage = "Invalid credentials";
     return res.status(200).render("login", payload);
   }
-  payload.errorMessage = "Make sure each field have valid value";
-  res.status(200).render("login");
+
+  payload.errorMessage = "Make sure each field has a valid value";
+  return res.status(200).render("login", payload);
 });
 module.exports = router;

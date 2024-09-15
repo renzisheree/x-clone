@@ -24,23 +24,23 @@ router.post("/", async (req, res, next) => {
         payload.password = await bcrypt.hash(password, 10);
         const newUser = await User.create(payload);
         req.session.user = newUser;
-        return res.status(201).redirect("/");
+        return res.status(201).redirect("/"); // Ensure return
       } else {
         if (email === user.email) {
           payload.errorMessage = "Email is already in use";
         } else {
           payload.errorMessage = "Username is already in use";
         }
-        return res.status(400).render("register", payload);
+        return res.status(400).render("register", payload); // Ensure return
       }
     } catch (err) {
       console.log(err);
       payload.errorMessage = "Something went wrong";
-      return res.status(400).render("register", payload);
+      return res.status(400).render("register", payload); // Ensure return
     }
   } else {
     payload.errorMessage = "Please make sure you fill all the fields";
-    return res.status(400).render("register", payload);
+    return res.status(400).render("register", payload); //
   }
 });
 module.exports = router;
