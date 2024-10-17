@@ -1,11 +1,17 @@
+:root {
+  --lightGrey: #dbdada;
+  --spacing: 12px;
+}
+
 nav {
   display: flex;
   flex-direction: column;
   justify-items: space;
   align-items: center;
   justify-content: space-between;
-  height: 100vh;
+  height: 90vh;
 }
+
 nav a {
   font-size: 25px;
   color: black;
@@ -25,5 +31,61 @@ nav a {
   align-items: center;
 }
 .mainSectionContainer {
-  background-color: blue;
+  padding: 0;
+  border: 1px solid var(--lightGrey);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 20px;
+  max-width: 630px;
+}
+
+.titleContainer {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 21px;
+}
+.postFormContainer {
+  display: flex;
+  border-bottom: 1px solid var(--lightGrey);
+  padding: 5px;
+  width: 100%;
+  align-items: center;
+}
+
+.userImageContainer {
+  width: 50px;
+  height: 50px;
+}
+.userImageContainer img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #fff;
+}
+.textareaContainer {
+  flex: 1;
+  padding-left: var(--spacing);
+  display: flex;
+  align-items: center;
+}
+.textareaContainer textarea {
+  color: #999999;
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 15px;
+  line-height: 21px;
+}
+#submitPostButton {
+  background-color: #fff;
+  color: black;
+  border-radius: 10px;
+  padding: 7px 15px;
+  border: 1px solid var(--lightGrey);
+}
+#submitPostButton:disabled {
+  color: var(--lightGrey);
 }
