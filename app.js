@@ -22,13 +22,13 @@ app.use(
     saveUninitialized: false,
   })
 );
-//routes
-const loginRoute = require("./routes/login.routes");
-const registerRoute = require("./routes/register.routes");
-const logoutRoute = require("./routes/logout.routes");
-app.use("/login", loginRoute);
-app.use("/register", registerRoute);
-app.use("/logout", registerRoute);
+
+// api routes
+const postRoutes = require("./routes/posts.route");
+const authRoutes = require("./routes/auth.routes");
+
+app.use(authRoutes);
+app.use(postRoutes);
 
 app.get("/", middleware.requireLogin, (req, res, next) => {
   var payload = { pageTitle: "Home", userLoggedIn: req.session.user };
