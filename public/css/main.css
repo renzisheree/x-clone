@@ -136,11 +136,22 @@ nav a {
 }
 
 .postFooter .postButtonContainer button {
-  padding: 0 5px;
   background-color: transparent;
   border: none;
   color: var(--grayButtonText);
+  padding: 2px 10px;
 }
-.postHeader:hover {
+.postHeader a:hover {
   text-decoration: underline;
+}
+
+.postHeader a,
+.postHeader span {
+  padding-right: 5px;
+}
+
+.postButtonContainer button:hover {
+  background-color: var(--lightGrey);
+  color: var(--grayText);
+  border-radius: 50%;
 }

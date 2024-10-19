@@ -33,10 +33,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "/images/profile-picture.jpeg",
     },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
   },
   { timestamps: true }
 );
 
-var user = mongoose.model("User", userSchema);
+var User = mongoose.model("User", userSchema);
 
-module.exports = user;
+module.exports = User;

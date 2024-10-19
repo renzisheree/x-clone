@@ -1,7 +1,5 @@
 //test if document is ready
-$(document).ready(() => {
-  alert("John Doe");
-});
+$(document).ready(() => {});
 $("#postTextarea").keyup((event) => {
   var textbox = $(event.target);
   var value = textbox.val().trim();
@@ -25,16 +23,19 @@ $("#submitPostButton").click((event) => {
     var html = createPostHTML(postData);
     $(".postContainer").prepend(html);
     textbox.val("");
-    button.prop("disable", true);
+    button.prop("disabled", true);
   });
 });
 
 function createPostHTML(postData) {
   var postedBy = postData.postedBy;
+  if (postedBy._id === undefined) {
+    return console.log("User object not populated");
+  }
   var displayName = postedBy.firstName + " " + postedBy.lastName;
-  var timeStamp = "will do later";
+  var timeStamp = timeDifference(new Date(), new Date(postData.createdAt));
   return `
-  <div class="post">
+  <div class="post" data-id='${postData._id}'>
         <div class="mainContentContainer">
             <div class="userImageContainer">
               <img src='${postedBy.profilePic}'/>
@@ -62,7 +63,7 @@ function createPostHTML(postData) {
                         </button>
                     </div>
                       <div class="postButtonContainer">
-                        <button>
+                        <button class='likeButton'>
                             <i class="fa-regular fa-heart"></i>
                         </button>
                     </div>
@@ -70,4 +71,43 @@ function createPostHTML(postData) {
             </div>
         </div>
   </div>`;
+}
+
+function timeDifference(current, previous) {
+  var msPerMinute = 60 * 1000;
+  var msPerHour = msPerMinute * 60;
+  var msPerDay = msPerHour * 24;
+  var msPerMonth = msPerDay * 30;
+  var msPerYear = msPerDay * 365;
+
+  var elapsed = current - previous;
+
+  if (elapsed < msPerMinute) {
+    if (elapsed / 1000 < 30) return "Just now";
+    return Math.round(elapsed / 1000) + " seconds ago";
+  } else if (elapsed < msPerHour) {
+    return Math.round(elapsed / msPerMinute) + " minutes ago";
+  } else if (elapsed < msPerDay) {
+    return Math.round(elapsed / msPerHour) + " hours ago";
+  } else if (elapsed < msPerMonth) {
+    return Math.round(elapsed / msPerDay) + " days ago";
+  } else if (elapsed < msPerYear) {
+    return Math.round(elapsed / msPerMonth) + " months ago";
+  } else {
+    return Math.round(elapsed / msPerYear) + " years ago";
+  }
+}
+
+$(document).on("click ", ".likeButton", (event) => {
+  var button = $(event.target);
+  var postId = getPostIdFromEl(button);
+  console.log(postId);
+});
+
+function getPostIdFromEl(el) {
+  var isRoot = el.hasClass("post");
+  var rootEl = isRoot ? el : el.closest(".post");
+  var postId = rootEl.data("id");
+  if (postId === undefined) return alert("post id undefined");
+  return postId;
 }
