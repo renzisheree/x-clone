@@ -76,21 +76,39 @@ exports.updatePost = async (req, res, next) => {
       .json({ message: "An error occurred", error: error.message });
   }
 };
-
 exports.retweetPost = async (req, res, next) => {
   try {
     const postId = req.params.id;
     const userId = req.session.user._id;
 
-    //try and delete retweet
+    // Try to delete the retweet
+    let deletedPost;
+    try {
+      deletedPost = await Posts.findOneAndDelete({
+        postedBy: userId,
+        retweetData: postId,
+      });
+    } catch (error) {
+      console.error("Error deleting retweet:", error);
+      return res.sendStatus(500);
+    }
 
-    const option = isLiked ? "$pull" : "$addToSet";
+    const option = deletedPost ? "$pull" : "$addToSet";
 
-    // Update user's likes
+    let repost = deletedPost;
+    if (!repost) {
+      try {
+        repost = await Posts.create({ postedBy: userId, retweetData: postId });
+      } catch (error) {
+        console.error("Error creating repost:", error);
+        return res.sendStatus(500);
+      }
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        [option]: { likes: postId },
+        [option]: { retweets: repost._id },
       },
       { new: true }
     );
@@ -104,10 +122,10 @@ exports.retweetPost = async (req, res, next) => {
     const updatedPost = await Posts.findByIdAndUpdate(
       postId,
       {
-        [option]: { likes: userId },
+        [option]: { retweetUsers: userId },
       },
       { new: true }
-    ).populate("postedBy");
+    );
 
     if (!updatedPost) {
       return res.sendStatus(404);
@@ -115,9 +133,9 @@ exports.retweetPost = async (req, res, next) => {
 
     res.status(200).send(updatedPost);
   } catch (error) {
-    console.error(error);
+    console.error("An unexpected error occurred:", error);
     res
-      .status(400)
+      .status(500)
       .json({ message: "An error occurred", error: error.message });
   }
 };

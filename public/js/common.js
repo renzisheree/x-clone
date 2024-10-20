@@ -43,16 +43,15 @@ $(document).on("click", ".retweetButton", (event) => {
     url: `/api/posts/${postId}/retweet`,
     type: "POST",
     success: (postData) => {
-      console.log(postData);
-      // button.find("span").text(postData.likes.length || "");
-      // if (postData.likes.includes(userLoggedIn._id)) {
-      //   button.addClass("active");
-      // } else {
-      //   button.removeClass("active");
-      // }
+      button.find("span").text(postData.retweetUsers.length || "");
+      if (postData.retweetUsers.includes(userLoggedIn._id)) {
+        button.addClass("active");
+      } else {
+        button.removeClass("active");
+      }
     },
     error: (error) => {
-      console.error("Error liking post:", error);
+      console.error("Error retweet:", error);
     },
   });
 });
@@ -115,6 +114,11 @@ function createPostHTML(postData) {
   const likeButtonActiveClass = postData.likes.includes(userLoggedIn._id)
     ? "active"
     : "";
+  const retweetButtonActiveClass = postData.retweetUsers.includes(
+    userLoggedIn._id
+  )
+    ? "active"
+    : "";
   return `
   <div class="post" data-id='${postData._id}'>
         <div class="mainContentContainer">
@@ -141,8 +145,9 @@ function createPostHTML(postData) {
                         </button>
                     </div>
                       <div class="postButtonContainer green">
-                        <button class="retweetButton">
+                        <button class="retweetButton ${retweetButtonActiveClass}">
                             <i class="fa-solid fa-retweet"></i>
+                             <span>${postData.retweetUsers.length || ""} </span>
                         </button>
                     </div>
                       <div class="postButtonContainer red">

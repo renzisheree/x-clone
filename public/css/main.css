@@ -4,6 +4,9 @@
   --grayText: rgb(101, 119, 134);
   --grayButtonText: rgba(0, 0, 0, 0.34);
   --red: #ff0034;
+  --redBackground: #dc58721c;
+  --green: rgb(23, 191, 99);
+  --greenBackground: rgba(23, 191, 99, 0.1);
 }
 
 nav {
@@ -163,4 +166,15 @@ button span {
 
 .postButtonContainer.red button.active {
   color: var(--red);
+}
+.postButtonContainer.green button.active {
+  color: var(--green);
+}
+.postButtonContainer.red button:hover {
+  background-color: var(--redBackground);
+  color: var(--red);
+}
+.postButtonContainer.green button:hover {
+  color: var(--green);
+  background-color: var(--greenBackground);
 }
