@@ -1,16 +1,23 @@
 const Posts = require("../models/posts.model");
 const User = require("../models/user.model");
 
-exports.getPost = async (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
   try {
-    const posts = await Posts.find()
-      .populate("postedBy")
-      .sort({ createdAt: -1 });
+    // Fetch posts and populate necessary fields
+    const posts = await getPosts({});
+
     res.status(200).send(posts);
   } catch (err) {
-    console.log(err);
-    res.sendStatus(400);
+    console.error(err);
+    res.status(400).json({ error: "An error occurred while fetching posts." });
   }
+};
+
+exports.getPost = async (req, res, next) => {
+  const postId = req.params.id;
+  const result = await getPosts({ _id: postId });
+
+  return res.status(200).send(result[0]);
 };
 exports.createPost = async (req, res, next) => {
   if (!req.body.content) {
@@ -137,5 +144,20 @@ exports.retweetPost = async (req, res, next) => {
     res
       .status(500)
       .json({ message: "An error occurred", error: error.message });
+  }
+};
+
+const getPosts = async (filter) => {
+  try {
+    const posts = await Posts.find(filter)
+      .populate("postedBy")
+      .populate("retweetData")
+      .sort({ createdAt: -1 });
+
+    return await User.populate(posts, {
+      path: "retweetData.postedBy",
+    });
+  } catch (err) {
+    console.error(err);
   }
 };

@@ -8,7 +8,7 @@ const postsSChema = new mongoose.Schema(
     pinned: Boolean,
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     retweetUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    retweetData: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
+    retweetData: { type: mongoose.Schema.Types.ObjectId, ref: "Posts" },
   },
 
   { timestamps: true }

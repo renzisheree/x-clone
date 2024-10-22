@@ -1,9 +1,12 @@
 //test if document is ready
 $(document).ready(() => {});
-$("#postTextarea").keyup((event) => {
+
+//disable key when not use
+$("#postTextarea ,  #replyTextarea").keyup((event) => {
   var textbox = $(event.target);
   var value = textbox.val().trim();
-  var submitButton = $("#submitPostButton");
+  var isModal = textbox.parents(".modal").length == 1;
+  var submitButton = isModal ? $("#submitReplyButton") : $("#submitPostButton");
   if (submitButton.length == 0) return alert("No submit button sign");
   if (value == "") {
     submitButton.prop("disabled", true);
@@ -12,6 +15,13 @@ $("#postTextarea").keyup((event) => {
   submitButton.prop("disabled", false);
 });
 
+$("#replyModal").on("show.bs.modal", (event) => {
+  var button = $(event.relatedTarget);
+  var postId = getPostIdFromEl(button);
+  $.get(`/api/posts/${postId}`, (result) => {
+    outputPost(result, $("#originalPostContainer"));
+  });
+});
 $(document).on("click", ".likeButton", (event) => {
   var button = $(event.target);
   var postId = getPostIdFromEl(button);
@@ -105,7 +115,12 @@ function getPostIdFromEl(el) {
 }
 
 function createPostHTML(postData) {
-  var postedBy = postData.postedBy;
+  const isRetweet = postData.retweetData !== undefined;
+  const retweetedBy = isRetweet ? postData.postedBy.username : null;
+
+  postData = isRetweet ? postData.retweetData : postData;
+  const postedBy = postData.postedBy;
+
   if (postedBy._id === undefined) {
     return console.log("User object not populated");
   }
@@ -119,8 +134,17 @@ function createPostHTML(postData) {
   )
     ? "active"
     : "";
+  retweetText = "";
+  if (isRetweet) {
+    retweetText = `<span>
+    <i class="fa-solid fa-retweet"></i>
+    Retweet by <a href="/profile/${retweetedBy}">@${retweetedBy}</a>
+    
+    </span>`;
+  }
   return `
   <div class="post" data-id='${postData._id}'>
+  <div class='postActionContainer'>${retweetText}</div>
         <div class="mainContentContainer">
             <div class="userImageContainer">
               <img src='${postedBy.profilePic}'/>
@@ -140,7 +164,7 @@ function createPostHTML(postData) {
                </div>
                <div class="postFooter">
                     <div class="postButtonContainer">
-                        <button>
+                        <button   data-bs-toggle='modal' data-bs-target='#replyModal'>
                             <i class="fa-regular fa-comment"></i>
                         </button>
                     </div>
@@ -160,4 +184,17 @@ function createPostHTML(postData) {
             </div>
         </div>
   </div>`;
+}
+function outputPost(result, container) {
+  container.html("");
+  if (!Array.isArray(result)) {
+    result = [result];
+  }
+  result.forEach((element) => {
+    var html = createPostHTML(element);
+    container.append(html);
+  });
+  if (result.length == 0) {
+    container.append("<span class='noResults'> Nothing to show </span>");
+  }
 }
