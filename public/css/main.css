@@ -189,3 +189,7 @@ button span {
   padding: 0;
   padding: var(--spacing);
 }
+
+.modal .post {
+  padding: 0 0 var(--spacing) 0;
+}

@@ -2,25 +2,39 @@
 $(document).ready(() => {});
 
 //disable key when not use
-$("#postTextarea ,  #replyTextarea").keyup((event) => {
-  var textbox = $(event.target);
-  var value = textbox.val().trim();
-  var isModal = textbox.parents(".modal").length == 1;
-  var submitButton = isModal ? $("#submitReplyButton") : $("#submitPostButton");
-  if (submitButton.length == 0) return alert("No submit button sign");
-  if (value == "") {
-    submitButton.prop("disabled", true);
+$(document).on("keyup", "#postTextarea, #replyTextarea", function () {
+  const textbox = $(this);
+  const isModal = textbox.closest(".modal").length === 1;
+  const value = textbox.val().trim();
+  const submitButton = isModal
+    ? $("#submitReplyButton")
+    : $("#submitPostButton");
+
+  if (submitButton.length === 0) {
+    console.error("No submit button found");
     return;
   }
-  submitButton.prop("disabled", false);
+
+  submitButton.prop("disabled", value === "");
+});
+
+$("#replyModal").on("shown.bs.modal", function () {
+  const textbox = $("#replyTextarea");
+  const value = textbox.val().trim();
+  $("#submitReplyButton").prop("disabled", value === "");
 });
 
 $("#replyModal").on("show.bs.modal", (event) => {
   var button = $(event.relatedTarget);
   var postId = getPostIdFromEl(button);
+
+  $("#submitReplyButton").data("id", postId);
   $.get(`/api/posts/${postId}`, (result) => {
     outputPost(result, $("#originalPostContainer"));
   });
+});
+$("#replyModal").on("hidden.bs.modal", () => {
+  $("#originalPostContainer").html("");
 });
 $(document).on("click", ".likeButton", (event) => {
   var button = $(event.target);
@@ -66,18 +80,36 @@ $(document).on("click", ".retweetButton", (event) => {
   });
 });
 
-$("#submitPostButton").click((event) => {
-  var button = $(event.target);
-  var textbox = $("#postTextarea");
+$(document).on("click", ".post", (event) => {
+  var element = $(event.target);
+  const postId = getPostIdFromEl(element);
+  if (postId !== undefined && !element.is("button")) {
+    window.location.href = "/posts/" + postId;
+  }
+});
 
+$("#submitPostButton, #submitReplyButton").click((event) => {
+  var button = $(event.target);
+  var isModal = button.parents(".modal").length == 1;
+
+  var textbox = isModal ? $("#replyTextarea") : $("#postTextarea");
   var data = {
     content: textbox.val(),
   };
+  if (isModal) {
+    const id = button.data().id;
+    if (id == null) return alert("id is null");
+    data.replyTo = id;
+  }
   $.post("/api/posts", data, (postData) => {
-    var html = createPostHTML(postData);
-    $(".postContainer").prepend(html);
-    textbox.val("");
-    button.prop("disabled", true);
+    if (postData.replyTo) {
+      location.reload();
+    } else {
+      var html = createPostHTML(postData);
+      $(".postContainer").prepend(html);
+      textbox.val("");
+      button.prop("disabled", true);
+    }
   });
 });
 
@@ -142,6 +174,15 @@ function createPostHTML(postData) {
     
     </span>`;
   }
+  var replyFlag = "";
+  if (postData.replyTo) {
+    if (!postData.replyTo._id) return alert("replyTo not populated");
+    else if (!postData.replyTo.postedBy._id)
+      return alert("postedBy not populated");
+    var replyToUsername = postData.replyTo.postedBy.username;
+    replyFlag = `<div class="replyFlag">
+    Replying to <a href="/profile/${replyToUsername}">${replyToUsername}</a></div>`;
+  }
   return `
   <div class="post" data-id='${postData._id}'>
   <div class='postActionContainer'>${retweetText}</div>
@@ -159,6 +200,7 @@ function createPostHTML(postData) {
                       <span class="date"> ${timeStamp}
                     </span>
                </div>
+               ${replyFlag}
                <div class="postBody">
                   <span>${postData.content}<span>
                </div>

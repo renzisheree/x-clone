@@ -3,7 +3,6 @@ const User = require("../models/user.model");
 
 exports.getPosts = async (req, res, next) => {
   try {
-    // Fetch posts and populate necessary fields
     const posts = await getPosts({});
 
     res.status(200).send(posts);
@@ -13,11 +12,36 @@ exports.getPosts = async (req, res, next) => {
   }
 };
 
+exports.getPostPage = async (req, res, next) => {
+  var payload = {
+    pageTitle: "View Post",
+    userLoggedIn: req.session.user,
+    userLoggedInJs: JSON.stringify(req.session.user),
+    postId: req.params.id,
+  };
+  return res.status(200).render("postPage", payload);
+};
+
 exports.getPost = async (req, res, next) => {
   const postId = req.params.id;
-  const result = await getPosts({ _id: postId });
-
-  return res.status(200).send(result[0]);
+  const postData = await getPosts({ _id: postId });
+  var results = {
+    postData: postData,
+  };
+  if (postData.replyTo !== undefined) {
+    results.replyTo = postData.replyTo;
+  }
+  results.replies = await getPosts({ replyTo: postId });
+  return res.status(200).send(postData[0]);
+};
+exports.getPostPage = async (req, res, next) => {
+  var payload = {
+    pageTitle: "View Post",
+    userLoggedIn: req.session.user,
+    userLoggedInJs: JSON.stringify(req.session.user),
+    postId: req.params.id,
+  };
+  return res.status(200).render("postPage", payload);
 };
 exports.createPost = async (req, res, next) => {
   if (!req.body.content) {
@@ -29,6 +53,9 @@ exports.createPost = async (req, res, next) => {
     content: req.body.content,
     postedBy: req.session.user,
   };
+  if (req.body.replyTo) {
+    postsData.replyTo = req.body.replyTo;
+  }
 
   try {
     const newPost = await Posts.create(postsData);
@@ -149,11 +176,14 @@ exports.retweetPost = async (req, res, next) => {
 
 const getPosts = async (filter) => {
   try {
-    const posts = await Posts.find(filter)
+    var posts = await Posts.find(filter)
       .populate("postedBy")
       .populate("retweetData")
+      .populate("replyTo")
       .sort({ createdAt: -1 });
-
+    posts = await User.populate(posts, {
+      path: "replyTo.postedBy",
+    });
     return await User.populate(posts, {
       path: "retweetData.postedBy",
     });

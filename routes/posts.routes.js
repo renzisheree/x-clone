@@ -5,10 +5,12 @@ const {
   getPost,
   updatePost,
   retweetPost,
+  getPostPage,
 } = require("../controllers/posts.controller");
 const router = express.Router();
 router.get("/api/posts", getPosts);
 router.get("/api/posts/:id", getPost);
+router.get("/posts/:id", getPostPage);
 
 router.post("/api/posts", createPost);
 router.put("/api/posts/:id/like", updatePost);

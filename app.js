@@ -24,7 +24,7 @@ app.use(
 );
 
 // api routes
-const postRoutes = require("./routes/posts.route");
+const postRoutes = require("./routes/posts.routes");
 const authRoutes = require("./routes/auth.routes");
 
 app.use(authRoutes);
