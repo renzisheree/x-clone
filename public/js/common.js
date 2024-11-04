@@ -27,14 +27,33 @@ $("#replyModal").on("shown.bs.modal", function () {
 $("#replyModal").on("show.bs.modal", (event) => {
   var button = $(event.relatedTarget);
   var postId = getPostIdFromEl(button);
-
   $("#submitReplyButton").data("id", postId);
   $.get(`/api/posts/${postId}`, (result) => {
-    outputPost(result, $("#originalPostContainer"));
+    outputPost(result.postData, $("#originalPostContainer"));
   });
 });
-$("#replyModal").on("hidden.bs.modal", () => {
-  $("#originalPostContainer").html("");
+$("#replyModal").on("hidden.bs.modal", () =>
+  $("#originalPostContainer").html("")
+);
+
+$("#deletePostModal").on("show.bs.modal", (event) => {
+  var button = $(event.relatedTarget);
+  var postId = getPostIdFromEl(button);
+  console.log(postId);
+  $("#deletePostButton").data("id", postId);
+});
+$("#deletePostButton").click((event) => {
+  const postId = $(event.target).data("id");
+  $.ajax({
+    url: `/api/posts/${postId}`,
+    type: "DELETE",
+    success: () => {
+      location.reload();
+    },
+    error: (error) => {
+      console.error("Error deleting post:", error);
+    },
+  });
 });
 $(document).on("click", ".likeButton", (event) => {
   var button = $(event.target);
@@ -98,6 +117,7 @@ $("#submitPostButton, #submitReplyButton").click((event) => {
   };
   if (isModal) {
     const id = button.data().id;
+    console.log(id);
     if (id == null) return alert("id is null");
     data.replyTo = id;
   }
@@ -146,7 +166,7 @@ function getPostIdFromEl(el) {
   return postId;
 }
 
-function createPostHTML(postData) {
+function createPostHTML(postData, largeFont = false) {
   const isRetweet = postData.retweetData !== undefined;
   const retweetedBy = isRetweet ? postData.postedBy.username : null;
 
@@ -166,66 +186,74 @@ function createPostHTML(postData) {
   )
     ? "active"
     : "";
+  var largeFontClass = largeFont ? "largeFont" : "";
   retweetText = "";
   if (isRetweet) {
     retweetText = `<span>
-    <i class="fa-solid fa-retweet"></i>
-    Retweet by <a href="/profile/${retweetedBy}">@${retweetedBy}</a>
-    
-    </span>`;
+      <i class="fa-solid fa-retweet"></i>
+      Retweet by <a href="/profile/${retweetedBy}">@${retweetedBy}</a>
+      
+      </span>`;
   }
   var replyFlag = "";
-  if (postData.replyTo) {
+  if (postData.replyTo && postData.replyTo._id) {
     if (!postData.replyTo._id) return alert("replyTo not populated");
     else if (!postData.replyTo.postedBy._id)
       return alert("postedBy not populated");
     var replyToUsername = postData.replyTo.postedBy.username;
     replyFlag = `<div class="replyFlag">
-    Replying to <a href="/profile/${replyToUsername}">${replyToUsername}</a></div>`;
+      Replying to <a href="/profile/${replyToUsername}">${replyToUsername}</a></div>`;
+  }
+  var button = "";
+  if (postData.postedBy._id == userLoggedIn._id) {
+    button = `<button data-id="${postData._id}" class="deleteBtn" data-bs-toggle="modal" data-bs-target="#deletePostModal"><i class="fa-solid fa-xmark"></i></button>`;
   }
   return `
-  <div class="post" data-id='${postData._id}'>
-  <div class='postActionContainer'>${retweetText}</div>
-        <div class="mainContentContainer">
-            <div class="userImageContainer">
-              <img src='${postedBy.profilePic}'/>
-            </div>
-            <div class="postContentContainer">
-               <div class="postHeader">
-                    <a href="/profile/${
-                      postedBy.username
-                    }" class="displayName">${displayName}<a/>
-                    <span class="username"> @${postedBy.username}
-                    </span>
-                      <span class="date"> ${timeStamp}
-                    </span>
-               </div>
-               ${replyFlag}
-               <div class="postBody">
-                  <span>${postData.content}<span>
-               </div>
-               <div class="postFooter">
-                    <div class="postButtonContainer">
-                        <button   data-bs-toggle='modal' data-bs-target='#replyModal'>
-                            <i class="fa-regular fa-comment"></i>
-                        </button>
-                    </div>
-                      <div class="postButtonContainer green">
-                        <button class="retweetButton ${retweetButtonActiveClass}">
-                            <i class="fa-solid fa-retweet"></i>
-                             <span>${postData.retweetUsers.length || ""} </span>
-                        </button>
-                    </div>
-                      <div class="postButtonContainer red">
-                        <button class='likeButton ${likeButtonActiveClass}'>
-                            <i class="fa-regular fa-heart"></i>
-                            <span>${postData.likes.length || ""} </span>
-                        </button>
-                    </div>
-               </div>
-            </div>
-        </div>
-  </div>`;
+    <div class="post ${largeFontClass}" data-id='${postData._id}'>
+    <div class='postActionContainer'>${retweetText}</div>
+          <div class="mainContentContainer">
+              <div class="userImageContainer">
+                <img src='${postedBy.profilePic}'/>
+              </div>
+              <div class="postContentContainer">
+                <div class="postHeader">
+                      <a href="/profile/${
+                        postedBy.username
+                      }" class="displayName">${displayName}</a>
+                      <span class="username"> @${postedBy.username}
+                      </span>
+                        <span class="date"> ${timeStamp}
+                      </span>
+                      ${button}
+                </div>
+                ${replyFlag}
+                <div class="postBody">
+                    <span>${postData.content}<span>
+                </div>
+                <div class="postFooter">
+                      <div class="postButtonContainer">
+                          <button type="button"  data-bs-toggle='modal' data-bs-target='#replyModal'>
+                              <i class="fa-regular fa-comment"></i>
+                          </button>
+                      </div>
+                        <div class="postButtonContainer green">
+                          <button class="retweetButton ${retweetButtonActiveClass}">
+                              <i class="fa-solid fa-retweet"></i>
+                              <span>${
+                                postData.retweetUsers.length || ""
+                              } </span>
+                          </button>
+                      </div>
+                        <div class="postButtonContainer red">
+                          <button class='likeButton ${likeButtonActiveClass}'>
+                              <i class="fa-regular fa-heart"></i>
+                              <span>${postData.likes.length || ""} </span>
+                          </button>
+                      </div>
+                </div>
+              </div>
+          </div>
+    </div>`;
 }
 function outputPost(result, container) {
   container.html("");
@@ -239,4 +267,18 @@ function outputPost(result, container) {
   if (result.length == 0) {
     container.append("<span class='noResults'> Nothing to show </span>");
   }
+}
+
+function outputPostWithReplies(results, container) {
+  container.html("");
+  if (results.replyTo !== undefined && results.replyTo._id !== undefined) {
+    var html = createPostHTML(results.replyTo);
+    container.append(html);
+  }
+  var mainPostHtml = createPostHTML(results.postData, true);
+  container.append(mainPostHtml);
+  results.replies.forEach((result) => {
+    var html = createPostHTML(result);
+    container.append(html);
+  });
 }

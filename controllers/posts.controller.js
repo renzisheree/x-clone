@@ -24,7 +24,8 @@ exports.getPostPage = async (req, res, next) => {
 
 exports.getPost = async (req, res, next) => {
   const postId = req.params.id;
-  const postData = await getPosts({ _id: postId });
+  var postData = await getPosts({ _id: postId });
+  postData = postData[0];
   var results = {
     postData: postData,
   };
@@ -32,7 +33,7 @@ exports.getPost = async (req, res, next) => {
     results.replyTo = postData.replyTo;
   }
   results.replies = await getPosts({ replyTo: postId });
-  return res.status(200).send(postData[0]);
+  return res.status(200).send(results);
 };
 exports.getPostPage = async (req, res, next) => {
   var payload = {
@@ -108,6 +109,16 @@ exports.updatePost = async (req, res, next) => {
     res
       .status(400)
       .json({ message: "An error occurred", error: error.message });
+  }
+};
+
+exports.deletePost = async (req, res, next) => {
+  try {
+    await Posts.findByIdAndDelete(req.params.id);
+    res.sendStatus(202);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
   }
 };
 exports.retweetPost = async (req, res, next) => {

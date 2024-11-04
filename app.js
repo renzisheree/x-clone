@@ -28,7 +28,7 @@ const postRoutes = require("./routes/posts.routes");
 const authRoutes = require("./routes/auth.routes");
 
 app.use(authRoutes);
-app.use(postRoutes);
+app.use(middleware.requireLogin, postRoutes);
 
 app.get("/", middleware.requireLogin, (req, res, next) => {
   var payload = {
