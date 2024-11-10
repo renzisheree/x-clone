@@ -1,0 +1,22 @@
+extends layout/main-layout.pug
+
+
+block content
+    if !profileUser
+        span.errorMessage There's no user with that username
+    else 
+        .profileHeaderContainer
+            .infoContainer
+
+                .userImageContainer
+                    img(src=profileUser.profilePic, alt="User profile picture")
+            .profileButtonContainer
+                if(profileUser._id !== userLoggedIn._id) 
+                    a.profileButton(href=`/messages/${profileUser._id}`) 
+                        i.fa-regular.fa-comment
+        .postContainer
+        +createReplyModal(userLoggedIn)
+        +createDeletePostModal(userLoggedIn)
+
+block scripts
+    script(src="/js/profile.js") 

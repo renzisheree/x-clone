@@ -26,9 +26,11 @@ app.use(
 // api routes
 const postRoutes = require("./routes/posts.routes");
 const authRoutes = require("./routes/auth.routes");
+const profileRoutes = require("./routes/profile.routes");
 
 app.use(authRoutes);
 app.use(middleware.requireLogin, postRoutes);
+app.use(middleware.requireLogin, profileRoutes);
 
 app.get("/", middleware.requireLogin, (req, res, next) => {
   var payload = {

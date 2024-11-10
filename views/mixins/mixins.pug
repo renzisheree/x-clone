@@ -38,3 +38,8 @@ mixin createDeletePostModal()
 mixin createPostModal(userLoggedIn)
     +createReplyModal(userLoggedIn)
     +createDeletePostModal()
+
+mixin createFollowButton(user, isFollowing)
+    - text = isFollowing ? "Following" : "Follow"
+    - button = isFollowing ? "followButton following" : "followButton"
+    button()
