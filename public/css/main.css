@@ -8,7 +8,11 @@
   --green: rgb(23, 191, 99);
   --greenBackground: rgba(23, 191, 99, 0.1);
 }
+a {
+  all: unset;
+}
 
+/* main css */
 nav {
   display: flex;
   flex-direction: column;
@@ -220,6 +224,7 @@ button span {
   margin-right: auto;
 }
 .profileHeaderContainer {
+  padding: var(--spacing);
   width: 100%;
 }
 .profileHeaderContainer .infoContainer {
@@ -232,21 +237,78 @@ button span {
   width: 132px;
   padding: var(--spacing);
   position: absolute;
-  right: 20px;
+  right: 35px;
   top: 0;
 }
-.profileHeaderContainer .profileButtonContainer {
-  text-align: right;
+.profileHeaderContainer .profileBottomContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-right: 50px;
 }
-.profileButton {
+.profileButton,
+.followButton {
+  border-radius: 10px;
   color: black;
-  font-size: 24px;
+  font-size: 14px;
   padding: 5px var(--spacing);
-  margin-left: var(--spacing);
 }
-.profileButton:hover {
+
+.followButton.following {
+  color: #20b820;
+  border: none;
+  background-color: var(--lightGrey);
+}
+
+.profileButton:hover,
+.followButton:hover {
   background-color: var(--lightGrey);
   border-radius: 10px;
   transition: background-color 0.3s ease;
+}
+.infoContainer .userInfoContainer {
+  display: flex;
+  flex-direction: column;
+}
+.infoContainer .userInfoContainer .username {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.followersContainer .value {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.followersContainer span:not(.value) {
+  color: var(--grayText);
+}
+.followersContainer a {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.tabsContainer {
+  display: flex;
+  border-bottom: 1px solid var(--lightGrey);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.tab {
+  flex: 1;
+  height: 41px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--grayText);
+  font-weight: bold;
+}
+.tab.active {
+  border-bottom: 1px solid black;
+  color: black;
+}
+.tab:hover {
+  color: black;
+  background-color: var(--lightGrey);
 }
