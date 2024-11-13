@@ -27,10 +27,12 @@ app.use(
 const postRoutes = require("./routes/posts.routes");
 const authRoutes = require("./routes/auth.routes");
 const profileRoutes = require("./routes/profile.routes");
+const userRoutes = require("./routes/user.routes");
 
 app.use(authRoutes);
 app.use(middleware.requireLogin, postRoutes);
 app.use(middleware.requireLogin, profileRoutes);
+app.use(userRoutes);
 
 app.get("/", middleware.requireLogin, (req, res, next) => {
   var payload = {

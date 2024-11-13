@@ -3,7 +3,14 @@ const User = require("../models/user.model");
 
 exports.getPosts = async (req, res, next) => {
   try {
-    const posts = await getPosts({});
+    var searchObj = req.query;
+    if (searchObj.isReply !== undefined) {
+      var isReply = searchObj.isReply == "true";
+      searchObj.replyTo = { $exists: isReply };
+      delete searchObj.isReply;
+    }
+
+    const posts = await getPosts(searchObj);
 
     res.status(200).send(posts);
   } catch (err) {

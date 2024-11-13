@@ -33,8 +33,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "/images/profile-picture.jpeg",
     },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
-    retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Posts" }],
+    retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Posts" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

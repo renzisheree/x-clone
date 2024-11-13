@@ -11,7 +11,13 @@ exports.getProfilePage = async (req, res, next) => {
 };
 exports.getUserProfile = async (req, res, next) => {
   var payload = await getPayload(req.params.username, req.session.user);
-  console.log(payload);
+  return res.status(200).render("profilePage", payload);
+};
+
+exports.getUserReply = async (req, res, next) => {
+  var payload = await getPayload(req.params.username, req.session.user);
+  payload.selectedTab = "replies";
+
   return res.status(200).render("profilePage", payload);
 };
 async function getPayload(username, userLoggedIn) {

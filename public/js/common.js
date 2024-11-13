@@ -107,6 +107,28 @@ $(document).on("click", ".post", (event) => {
   }
 });
 
+$(document).on("click", ".followButton", (event) => {
+  const button = $(event.target);
+  var userId = button.data().user;
+
+  $.ajax({
+    url: `/api/users/${userId}/follow`,
+    type: "PUT",
+    success: (data) => {
+      console.log(data);
+      // button.find("span").text(postData.retweetUsers.length || "");
+      // if (postData.retweetUsers.includes(userLoggedIn._id)) {
+      //   button.addClass("active");
+      // } else {
+      //   button.removeClass("active");
+      // }
+    },
+    error: (error) => {
+      console.error("Error retweet:", error);
+    },
+  });
+});
+
 $("#submitPostButton, #submitReplyButton").click((event) => {
   var button = $(event.target);
   var isModal = button.parents(".modal").length == 1;

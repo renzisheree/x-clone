@@ -12,6 +12,9 @@ a {
   all: unset;
 }
 
+.wrapper > .row {
+  margin: 0;
+}
 /* main css */
 nav {
   display: flex;
