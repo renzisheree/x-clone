@@ -253,14 +253,18 @@ button span {
 .followButton {
   border-radius: 10px;
   color: black;
+  border: 1px solid var(--lightGrey);
   font-size: 14px;
+  margin-left: var(--spacing);
+  background-color: white;
   padding: 5px var(--spacing);
 }
 
 .followButton.following {
   color: #20b820;
   border: none;
-  background-color: var(--lightGrey);
+
+  border: 1px solid var(--lightGrey);
 }
 
 .profileButton:hover,
@@ -314,4 +318,23 @@ button span {
 .tab:hover {
   color: black;
   background-color: var(--lightGrey);
+}
+
+.noResults {
+  padding: var(--spacing);
+}
+
+.resultsContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+.resultsContainer .user {
+  padding: var(--spacing);
+  display: flex;
+  border-bottom: 1px solid var(--lightGrey);
+}
+.user .userDetailContainer {
+  flex: 1;
+  padding: 0 var(--spacing);
 }

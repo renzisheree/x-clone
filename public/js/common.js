@@ -108,23 +108,40 @@ $(document).on("click", ".post", (event) => {
 });
 
 $(document).on("click", ".followButton", (event) => {
-  const button = $(event.target);
+  var button = $(event.target);
   var userId = button.data().user;
 
   $.ajax({
     url: `/api/users/${userId}/follow`,
     type: "PUT",
-    success: (data) => {
-      console.log(data);
-      // button.find("span").text(postData.retweetUsers.length || "");
-      // if (postData.retweetUsers.includes(userLoggedIn._id)) {
-      //   button.addClass("active");
-      // } else {
-      //   button.removeClass("active");
-      // }
+    success: (data, status, xhr) => {
+      if (xhr.status == 404) {
+        return;
+      }
+
+      // Update userLoggedIn object with new data
+      userLoggedIn = data;
+
+      // Update button state
+      if (data.following && data.following.includes(userId)) {
+        button.addClass("following");
+        button.text("Following");
+      } else {
+        button.removeClass("following");
+        button.text("Follow");
+      }
+
+      // Update follower count if it exists
+      var followerLabel = $("#followersValue");
+      if (followerLabel.length != 0) {
+        var followersText = parseInt(followerLabel.text());
+        followerLabel.text(
+          followersText + (data.following.includes(userId) ? 1 : -1)
+        );
+      }
     },
     error: (error) => {
-      console.error("Error retweet:", error);
+      console.error("Error following/unfollowing:", error);
     },
   });
 });
