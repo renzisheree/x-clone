@@ -40,15 +40,20 @@ block content
                             +createFollowButton(profileUser , true)
                         - else 
                             +createFollowButton(profileUser , false)
-
-                        
+                  
         .tabsContainer
             +createTab("Posts",`/profile/${profileUser.username}/`, selectedTab != "replies")
             +createTab("Replies",`/profile/${profileUser.username}/replies`, selectedTab == "replies")
+
+        .pinPostContainer
+
         .postContainer
+
         +createReplyModal(userLoggedIn)
         +createDeletePostModal(userLoggedIn)
         +createImageUploadModal(userLoggedIn)
+        +createPinPostModal()
+        +createUnpinPostModal()
 
 block scripts
     script(src="/js/profile.js") 

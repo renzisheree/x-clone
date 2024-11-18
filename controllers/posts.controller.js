@@ -205,6 +205,26 @@ exports.retweetPost = async (req, res, next) => {
   }
 };
 
+exports.pinPost = async (req, res, next) => {
+  if (req.body.pin !== undefined) {
+    await Posts.updateMany(
+      { postedBy: req.session.user._id },
+      { pin: false }
+    ).catch((error) => {
+      console.log(error);
+      res.sendStatus(400);
+    });
+  }
+
+  try {
+    await Posts.findByIdAndUpdate(req.params.id, req.body);
+    res.sendStatus(202);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
+  }
+};
+
 const getPosts = async (filter) => {
   try {
     var posts = await Posts.find(filter)

@@ -38,6 +38,7 @@ mixin createDeletePostModal()
 mixin createPostModal(userLoggedIn)
     +createReplyModal(userLoggedIn)
     +createDeletePostModal()
+    +createPinPostModal()
 
 mixin createFollowButton(user, isFollowing)
     - text = isFollowing ? "Following" : "Follow"
@@ -64,3 +65,32 @@ mixin createImageUploadModal()
                 .modal-footer
                     button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Cancel
                     button#imageUploadButton.btn.btn-primary(type='button') Save
+
+
+mixin createPinPostModal()
+    #confirmPinModal.modal.fade(tabindex='-1' aria-labelledby='confirmMinModal' aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h1#confirmMinModalLabel.modal-title.fs-5 Pin this post?
+                    button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                .modal-body
+                    p This post will appear at the top of your profile, you can only pin one post
+                .modal-footer
+                    button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Cancel
+                    button#pinPostButton.btn.btn-primary(type='button') Yes
+
+
+
+mixin createUnpinPostModal()
+    #unpinModal.modal.fade(tabindex='-1' aria-labelledby='unpinModalLabel' aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h1#unpinModalLabel.modal-title.fs-5 Unpin this post?
+                    button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                .modal-body
+                    p This post will be unpin
+                .modal-footer
+                    button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Cancel
+                    button#unpinPostButton.btn.btn-primary(type='button') Yes
