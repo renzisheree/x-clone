@@ -9,6 +9,19 @@ exports.getPosts = async (req, res, next) => {
       searchObj.replyTo = { $exists: isReply };
       delete searchObj.isReply;
     }
+    if (searchObj.followingOnly !== undefined) {
+      var followingOnly = searchObj.followingOnly == "true";
+      if (followingOnly) {
+        var objectIds = [];
+        req.session.user.following.forEach((user) => {
+          objectIds.push(user);
+        });
+        objectIds.push(req.session.user._id);
+        searchObj.postedBy = { $in: objectIds };
+      }
+
+      delete searchObj.followingOnly;
+    }
 
     const posts = await getPosts(searchObj);
 

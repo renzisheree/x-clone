@@ -338,3 +338,24 @@ button span {
   flex: 1;
   padding: 0 var(--spacing);
 }
+
+.profilePictureButton {
+  position: absolute;
+  color: rgba(0, 0, 0, 0.6);
+  border: none;
+  font-size: 30px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  right: 15px;
+  background-color: transparent;
+  display: none;
+}
+.userImageContainer:hover .profilePictureButton {
+  display: block;
+}
+
+#imagePreview {
+  width: 100%;
+  display: block;
+  max-width: 100%;
+}

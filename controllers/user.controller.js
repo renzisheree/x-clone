@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
-
+const path = require("path");
+const fs = require("fs");
 exports.followUser = async (req, res, next) => {
   try {
     var userId = req.params.userId;
@@ -51,4 +52,41 @@ exports.getFollowing = async (req, res, next) => {
     console.log(error);
     res.sendStatus(400);
   }
+};
+exports.getFollowers = async (req, res, next) => {
+  try {
+    const result = await User.findById(req.params.id).populate("followers");
+    res.status(200).send(result);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(400);
+  }
+};
+
+exports.updateProfilePicture = async (req, res, next) => {
+  if (!req.file) {
+    console.log("no file uploaded ");
+    return res.sendStatus(400);
+  }
+
+  var filePath = `/uploads/images/${req.file.filename}.png`;
+  var tempPath = req.file.path;
+  var targetPath = path.join(__dirname, `../${filePath}`);
+
+  fs.rename(tempPath, targetPath, (err) => {
+    if (err != null) {
+      console.log(err);
+      return res.sendStatus(400);
+    }
+  });
+
+  req.session.user = await User.findByIdAndUpdate(
+    req.session.user._id,
+    {
+      profilePic: filePath,
+    },
+    { new: true }
+  );
+
+  res.sendStatus(204);
 };

@@ -1,3 +1,6 @@
+//global
+var cropper;
+
 //test if document is ready
 $(document).ready(() => {});
 
@@ -42,6 +45,7 @@ $("#deletePostModal").on("show.bs.modal", (event) => {
   console.log(postId);
   $("#deletePostButton").data("id", postId);
 });
+
 $("#deletePostButton").click((event) => {
   const postId = $(event.target).data("id");
   $.ajax({
@@ -55,6 +59,7 @@ $("#deletePostButton").click((event) => {
     },
   });
 });
+
 $(document).on("click", ".likeButton", (event) => {
   var button = $(event.target);
   var postId = getPostIdFromEl(button);
@@ -76,7 +81,43 @@ $(document).on("click", ".likeButton", (event) => {
     },
   });
 });
+$("#filePhoto").change(function () {
+  if (this.files && this.files[0]) {
+    var reader = new FileReader();
+    reader.onload = (e) => {
+      var image = document.getElementById("imagePreview");
 
+      image.src = e.target.result;
+
+      if (cropper !== undefined) {
+        cropper.destroy();
+      }
+      cropper = new Cropper(image, { aspectRatio: 1 / 1, background: false });
+    };
+    reader.readAsDataURL(this.files[0]);
+  }
+});
+
+$("#imageUploadButton").click(() => {
+  var canvas = cropper.getCroppedCanvas();
+  if (canvas == null) {
+    alert("could not upload image, make sure it image file!");
+  }
+  canvas.toBlob((blob) => {
+    const formData = new FormData();
+    formData.append("croppedImage", blob);
+    $.ajax({
+      url: "/api/users/profilePicture",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: () => {
+        location.reload();
+      },
+    });
+  });
+});
 $(document).on("click", ".retweetButton", (event) => {
   var button = $(event.target);
   var postId = getPostIdFromEl(button);
